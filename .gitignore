@@ -1,3 +1,8 @@
+*~
+*.obj
+*.dll
+autom4te.cache
+config.h.in
 configure
 jasmine.tex
 jasmine.html
