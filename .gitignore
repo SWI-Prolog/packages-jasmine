@@ -7,3 +7,11 @@ configure
 jasmine.tex
 jasmine.html
 jasmine.pdf
+Makefile
+config.h
+config.log
+config.status
+jasmine.aux
+jasmine.log
+jasmine.out
+jasmine.toc
