@@ -103,8 +103,6 @@ object_name(SH, Class, Name) :-
 	       get(cname, Name)
 	     ]).
 
-:- style_check(-atom).
-
 class_properties(Class, Properties) :-
 	jasmine(SH),
 	odql(SH,
