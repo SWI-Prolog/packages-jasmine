@@ -1,7 +1,7 @@
 ################################################################
 # SWI-Prolog `Jasmine' package
-# Author:    Jan Wielemaker. jan@swi.psy.uva.nl
-# Copyright: LGPL (see COPYING or www.gnu.org
+# Author:    Jan Wielemaker. J.Wielemaker@vu.nl
+# Copyright: Simplified BSD
 ################################################################
 
 .SUFFIXES: .tex .dvi .doc .pl
