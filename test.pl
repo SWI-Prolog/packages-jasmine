@@ -35,92 +35,93 @@
 :- use_module(jasmine).
 
 :- dynamic
-	jasmine/1.
+    jasmine/1.
 
 open :-
-	odb_ses_start(H, 'einstein::jasmine/jasmine', _, _, _),
-	asserta(jasmine(H)),
-	exec('Transaction.start();').	% ensure a transaction
+    odb_ses_start(H, 'einstein::jasmine/jasmine', _, _, _),
+    asserta(jasmine(H)),
+    exec('Transaction.start();').   % ensure a transaction
 
 close :-
-	retract(jasmine(H)), !,
-	odb_ses_end(H).
+    retract(jasmine(H)),
+    !,
+    odb_ses_end(H).
 
 exec(Cmd) :-
-	jasmine(H),
-	odb_exec_odql(H, Cmd).
+    jasmine(H),
+    odb_exec_odql(H, Cmd).
 
 get_var(Name, Value) :-
-	ensure_transaction,
-	jasmine(H),
-	odb_get_var(H, Name, Value).
+    ensure_transaction,
+    jasmine(H),
+    odb_get_var(H, Name, Value).
 
 set_var(Name, Value) :-
-	ensure_transaction,
-	jasmine(H),
-	odb_set_var(H, Name, Value).
+    ensure_transaction,
+    jasmine(H),
+    odb_set_var(H, Name, Value).
 
 ensure_transaction :-
-	exec('if (Transaction.isWithinTransaction() != TRUE) { Transaction.start(); };').
+    exec('if (Transaction.isWithinTransaction() != TRUE) { Transaction.start(); };').
 
-		 /*******************************
-		 *     CLASSES AND FAMILIES	*
-		 *******************************/
+                 /*******************************
+                 *     CLASSES AND FAMILIES     *
+                 *******************************/
 
-%	Get all Jasmine class families
+%       Get all Jasmine class families
 
 families(List) :-
-	jasmine(SH),
-	ensure_transaction,
-	odql(SH,
-	     [ ss:'Bag<String>',
-	       pcount:'Integer'
-	     ],
-	     [ 'ss = FamilyManager.getAllFamilies();',
-	       'pcount = ss.count();',
-	       get(pcount, C),
-	       { format('Found ~w families~n', [C])
-	       },
-	       get_list(ss, List)
-	     ]).
+    jasmine(SH),
+    ensure_transaction,
+    odql(SH,
+         [ ss:'Bag<String>',
+           pcount:'Integer'
+         ],
+         [ 'ss = FamilyManager.getAllFamilies();',
+           'pcount = ss.count();',
+           get(pcount, C),
+           { format('Found ~w families~n', [C])
+           },
+           get_list(ss, List)
+         ]).
 
 family_classes(Family, Classes) :-
-	jasmine(SH),
-	ensure_transaction,
-	odql(SH,
-	     [ cBag:'Bag<Composite class>',
-	       cc:'Composite class',
-	       cname:'String'
-	     ],
-	     [ 'defaultCF ~w;'-[Family],
-	       'cBag = FamilyManager.getAllClasses("~w");'-[Family],
-	       { odb_collection_to_list(SH, cBag, ClassObjects),
-		 maplist(object_name(SH), ClassObjects, Classes)
-	       }
-	     ]).
+    jasmine(SH),
+    ensure_transaction,
+    odql(SH,
+         [ cBag:'Bag<Composite class>',
+           cc:'Composite class',
+           cname:'String'
+         ],
+         [ 'defaultCF ~w;'-[Family],
+           'cBag = FamilyManager.getAllClasses("~w");'-[Family],
+           { odb_collection_to_list(SH, cBag, ClassObjects),
+             maplist(object_name(SH), ClassObjects, Classes)
+           }
+         ]).
 
 object_name(SH, Class, Name) :-
-	odql(SH, [],
-	     [ set(cc, Class),
-	       'cname = cc.getClassName();',
-	       get(cname, Name)
-	     ]).
+    odql(SH, [],
+         [ set(cc, Class),
+           'cname = cc.getClassName();',
+           get(cname, Name)
+         ]).
 
 class_properties(Class, Properties) :-
-	jasmine(SH),
-	odql(SH,
-	     [ 'PhysBagTup':'Bag<T1[Integer propType,
-				    String name,
-				    String CFName,
-				    String className,
-				    Boolean isClass,
-				    Boolean isSet,
-				    String propDescription,
-				    Integer precision,
-				    Integer scale,
-				    Boolean isMandatory,
-				    Boolean isUnique]>'
-	     ],
-	     [ 'PhysBagTup = (T1)~w.getPropInfo(TRUE);'-[Class],
-	       get_list('PhysBagTup', Properties)
-	     ]).
+    jasmine(SH),
+    odql(SH,
+         [ 'PhysBagTup':'Bag<T1[Integer propType,
+\t\t\t\t    String name,
+\t\t\t\t    String CFName,
+\t\t\t\t    String className,
+\t\t\t\t    Boolean isClass,
+\t\t\t\t    Boolean isSet,
+\t\t\t\t    String propDescription,
+\t\t\t\t    Integer precision,
+\t\t\t\t    Integer scale,
+\t\t\t\t    Boolean isMandatory,
+\t\t\t\t    Boolean isUnique]>'
+         ],
+         [ 'PhysBagTup = (T1)~w.getPropInfo(TRUE);'-[Class],
+           get_list('PhysBagTup', Properties)
+         ]).

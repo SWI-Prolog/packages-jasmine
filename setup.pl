@@ -36,77 +36,78 @@ lib(jasmine).
 dll(jasmine).
 
 install :-
-	install_library,
-	install_dlls.
+    install_library,
+    install_dlls.
 
 install_library :-
-	forall(lib(Base), install_lib(Base)),
-	lib_dest(Dest),
-	make_library_index(Dest).
+    forall(lib(Base), install_lib(Base)),
+    lib_dest(Dest),
+    make_library_index(Dest).
 
 install_lib(Base) :-
-	lib_dest(Lib),
-	absolute_file_name(Base,
-			   [ extensions([pl]),
-			     access(read)
-			   ],
-			   Src),
-	progress(cp(Src, Lib)).
+    lib_dest(Lib),
+    absolute_file_name(Base,
+                       [ extensions([pl]),
+                         access(read)
+                       ],
+                       Src),
+    progress(cp(Src, Lib)).
 
 lib_dest(Lib) :-
-	current_prolog_flag(home, PlHome),
-	atomic_list_concat([PlHome, library], /, Lib).
+    current_prolog_flag(home, PlHome),
+    atomic_list_concat([PlHome, library], /, Lib).
 
 install_dlls :-
-	forall(dll(Base), install_dll(Base)).
+    forall(dll(Base), install_dll(Base)).
 
 install_dll(Base) :-
-	dll_dest(Dir),
-	absolute_file_name(Base,
-			   [ extensions([dll]),
-			     access(read)
-			   ],
-			   Src),
-	progress(cpbin(Src, Dir)).
+    dll_dest(Dir),
+    absolute_file_name(Base,
+                       [ extensions([dll]),
+                         access(read)
+                       ],
+                       Src),
+    progress(cpbin(Src, Dir)).
 
 dll_dest(Dir) :-
-	current_prolog_flag(home, PlHome),
-	atomic_list_concat([PlHome, bin], /, Dir).
+    current_prolog_flag(home, PlHome),
+    atomic_list_concat([PlHome, bin], /, Dir).
 
 
-%	cp(From, To)
+%       cp(From, To)
 %
-%	Copy a file to a destination (file or directory).
+%       Copy a file to a destination (file or directory).
 
 cp(Src, Dest) :-
-	cp(Src, Dest, [type(text)]).
+    cp(Src, Dest, [type(text)]).
 
 cpbin(Src, Dest) :-
-	cp(Src, Dest, [type(binary)]).
+    cp(Src, Dest, [type(binary)]).
 
 cp(Src, Dir, Options) :-
-	exists_directory(Dir), !,
-	file_base_name(Src, Base),
-	atomic_list_concat([Dir, Base], /, Dest),
-	cp(Src, Dest, Options).
+    exists_directory(Dir),
+    !,
+    file_base_name(Src, Base),
+    atomic_list_concat([Dir, Base], /, Dest),
+    cp(Src, Dest, Options).
 cp(Src, Dest, Options) :-
-	open(Src, read, In, Options),
-	open(Dest, write, Out, Options),
-	copy_stream_data(In, Out),
-	close(Out),
-	close(In).
+    open(Src, read, In, Options),
+    open(Dest, write, Out, Options),
+    copy_stream_data(In, Out),
+    close(Out),
+    close(In).
 
 progress(Goal) :-
-	format('~p ... ', [Goal]),
-	flush_output,
-	(   catch(Goal, E, (print_message(error, E), fail))
-	->  format('ok~n', [])
-	;   format('FAILED~n', [])
-	).
+    format('~p ... ', [Goal]),
+    flush_output,
+    (   catch(Goal, E, (print_message(error, E), fail))
+    ->  format('ok~n', [])
+    ;   format('FAILED~n', [])
+    ).
 
-		 /*******************************
-		 *	     ACTIVATE		*
-		 *******************************/
+                 /*******************************
+                 *           ACTIVATE           *
+                 *******************************/
 
 :- (   install
    ->  format('~N~nInstallation complete~n~n', [])
